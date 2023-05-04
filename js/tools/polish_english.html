@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<style>
+p, textarea {
+	font-family: arial;
+}
+</style>
+<p>Paste polish sentances in the left box to get an approximate pronunciation in english</p>
+<textarea id="polish" rows="12" cols="50"></textarea>
+<textarea id="english" rows="12" cols="50" readonly></textarea>
+<br>
+<button onclick="change()">Translate</button>
+
+<script>
+let letterArr = {"c": "ts", "ą": "on", "ć": "tch", "ę": "en", "ł": "w", "ń": "n", "ó": "ou", "ś": "sh", "ź": "zh", "ż": "rz"};
+let polish = document.getElementById("polish");
+let english = document.getElementById("english");
+	
+function change(){
+	english.value = "";
+	let str = polish.value;
+	for (let i = 0; i<str.length; i++)
+		english.value += checkLetter(str[i].toLowerCase());
+}
+
+function checkLetter(aLetter){
+	for (let key in letterArr) {
+		if (letterArr.hasOwnProperty(aLetter))
+			return letterArr[aLetter];
+		else
+			return aLetter;
+	}
+}
+</script>
+</html>

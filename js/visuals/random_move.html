@@ -1,0 +1,82 @@
+<html>
+<canvas id="gameCanvas" width = "800" height = "600"></canvas>
+
+<script>
+var canvas;
+var canvasContext;
+var w;
+var h;
+
+var diagonal = false;
+var playerScore = 0;
+var playerXSpeed = 5;
+var playerYSpeed = 5;
+var playerX = 400;
+var playerY = 300;
+
+window.onload = function(){
+	canvas = document.getElementById('gameCanvas');	
+	canvasContext = canvas.getContext('2d');
+	w = canvas.width;
+	h = canvas.height;
+	
+	loop();
+
+	var FPS = 60;
+	setInterval(function(){
+		moveEverything();
+		drawEverything();
+	}, 1000/FPS);
+
+	canvas.addEventListener('mousedown', handleMouseClick);
+}
+
+function handleMouseClick(evt){
+	diagonal = !diagonal;
+}
+
+function loop() {
+    var rand = Math.round(Math.random() * 50) + 10;
+    setTimeout(function() {
+            randomDir();
+            loop();  
+    }, rand);
+}
+
+function randomDir(){
+	playerXSpeed = -5+5*Math.floor(Math.random()*4);
+	if(playerXSpeed == 0 || playerXSpeed == 10){
+		playerXSpeed = 0;
+		playerYSpeed = -5+10*Math.floor(Math.random()*2);
+	}else{
+		playerYSpeed = 0;
+	}
+
+	if(diagonal){
+		playerXSpeed = -5+Math.floor(Math.random()*11);
+		playerYSpeed = -5+Math.floor(Math.random()*11);
+	}
+}
+
+function moveEverything(){
+	if(playerX+playerXSpeed < w && playerX+playerXSpeed > 0){
+		playerX += playerXSpeed;
+	}
+	if(playerY+playerYSpeed < h && playerY+playerYSpeed > 0){
+		playerY += playerYSpeed;
+	}
+}
+
+function drawEverything(){
+	
+	canvasContext.fillStyle = 'rgba(0, 0, 0, .1)';
+	canvasContext.fillRect(0, 0, w, h);
+
+	canvasContext.fillStyle = 'white'
+	canvasContext.fillRect(playerX, playerY, 10, 10);
+}
+
+</script>
+<br>
+Click to change behaviour
+</html>

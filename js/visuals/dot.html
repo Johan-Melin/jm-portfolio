@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<body>
+<canvas id="gc" width=800 height=600"></canvas>
+<script>
+	var pos = [];
+	for(var i = 0; i<800;i++){
+		pos.push({x: i, y: 300, xv: 0, yv: 0});
+	}
+	window.onload=function(){
+		canv=document.getElementById('gc');
+		ctx=canv.getContext('2d');
+		ctx.fillStyle="rgba(255, 64, 64, 0.02)";
+		setInterval(function(){
+			update();
+		}, 1);
+	}
+	
+	function update(){
+		pos.forEach(function(el){
+			el.xv +=Math.random()*.02-.01;
+			el.yv +=Math.random()*.02-.01;
+			el.x +=el.xv;
+			el.y +=el.yv;
+			var rect = ctx.fillRect(el.x, el.y, 1, 1);
+		});
+	}
+	
+</script>
+</body>
+</html>

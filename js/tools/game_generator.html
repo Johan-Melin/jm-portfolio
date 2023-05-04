@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<link href="https://fonts.googleapis.com/css?family=Jua" rel="stylesheet">
+<style>
+.content{
+	font-family: 'Jua', sans-serif;
+	background-color: #eee;
+	text-align: center;
+}
+p{
+	margin: 10px;
+	font-size: 32px;
+	color: #ccc;
+	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+p.title{
+	font-size: 64px;
+}
+.button {
+	margin: 10px;
+	font-family: 'Jua', sans-serif;
+    background-color: #222;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    font-size: 16px;
+}
+</style>
+<script>
+var setting = ["atmospheric", "cartoony", "casual", "comedy", "cute", "dark", "dark humored", "historical", "fantasy", "mature", "medieval", "moddable", "realistic", "relaxing", "sci-fi", "steampunk", "tactical", "violent"];
+var gameTag = ["action", "adventure", "arcade", "battle royale", "city builder", "clicker", "co-op", "crafting", "dating-sim", "hidden object", "horror", "management", "mmo", "moba", "multiplayer", "parody", "platformer", "point & click", "puzzle", "racing", "retro", "rogue-like", "rpg", "sandbox", "stealth", "strategy", "survival", "tower defense", "visual novel"];
+
+var prefix = ["Blast", "Crimson", "Cuddly", "Cyber", "Dead", "Final", "Fluffy", "Fusion", "Grim", "Infected", "Lunar", "Mad", "Magic", "Nuclear", "Phantom", "Primal", "Rush", "Turbo", "Twilight", "Wacky"];
+var occupation = ["Assassin", "Cop", "Cowboy", "Demon", "Devil", "Knight", "Ninja", "Pirate", "Party", "Viking", "Wizard"];
+var animals = ["Bear", "Cat", "Chicken", "Dog", "Emu", "Fox", "Frog", "Lizard", "Monkey", "Panda", "Penguin", "Poodle", "Sheep", "Snake", "Toad"];
+var loc = ["Assault", "Castle", "Cave", "Conflict", "Disco", "Dungeon", "Fantasy", "Struggle"];
+var suffix = ["Battle", "Call", "Crush", "Decay", "Hunt", "Kill", "Lust", "Mayhem", "Rain", "Rainbow", "Resurrection", "Salvation", "Slaughter", "War"];
+
+var plot;
+var name;
+
+function printGame(){
+	name = "";
+	name += getName(prefix)+" ";
+	if(odds(0.5))
+		name += getName(occupation)+" ";
+	if(odds(0.5))
+		name += getName(animals)+" ";
+	if(odds(0.5))
+		name += getName(loc)+" ";
+	name += getName(suffix);
+
+	plot = "A ";
+	if(odds(0.5))
+		plot += getName(setting) + " ";
+	var a = getName(gameTag);
+	var b = getName(gameTag);
+	while (b == a)
+		b = getName(gameTag);
+	plot += a+" "+b+" game ";
+	document.getElementById('demo').innerHTML = "<p class='title'>"+name + "</p><br />"+plot + "<br />";	
+}
+
+function odds(val){
+	return Math.random() >= val;
+}
+
+function getName(arr){
+	return arr[Math.floor(arr.length*Math.random())];
+}
+
+//-->
+</script>
+
+<div class="content">
+<p><button class="button" onclick="printGame()">New Game</button></p>
+<p id="demo"></p>
+<p><script>
+    printGame();
+</script></p>
+</content>
+</html>

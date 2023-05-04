@@ -1,0 +1,99 @@
+<html>
+<canvas id="gameCanvas" width = "800" height = "600"></canvas>
+
+<script>
+var canvas;
+var ctx;
+
+var mousePos;
+var rain = [];
+var xDif;
+var yDif;
+
+window.onload = function(){
+
+	canvas = document.getElementById('gameCanvas');	
+	ctx = canvas.getContext('2d');
+
+	initRain();
+	
+	var FPS = 60;
+	setInterval(function(){
+		moveEverything();
+		drawEverything();
+	}, 1000/FPS);
+	mousePos = { x: -200, y: -200 };
+
+	canvas.addEventListener('mousemove', function(evt){
+			mousePos = {x: evt.clientX, y: evt.clientY};
+		});
+
+	canvas.addEventListener('mousedown', changeColor);
+}
+
+function changeColor(){
+	var _c = Math.random()*300;
+	var _rng = Math.random()*4;
+	for(var i = 0; i < 200; i++){
+		var _col = _c+i/_rng;
+		rain[i].col = 'hsl('+ _col + ', 100%, 50%)';
+	}
+}
+
+function initRain(){
+	for(var i = 0; i < 200; i++){
+		var _x = _xx = i*4;
+		var _y = -Math.random()*canvas.height;
+		var _yVel = 6+Math.random()*4;
+		var _col = 'hsl('+ 100+i/4 + ', 100%, 50%)';
+		
+		rain[i] = {x: _x, y: _y, col: _col, yVel: _yVel, xx: _xx};
+	}
+}
+
+function avoidMouse(i){
+	if(mousePos != null){
+	 	var mouseDist = 100;
+		var dif = calcDist(rain[i], mousePos);
+		if (dif > -mouseDist && dif < mouseDist){
+			var normVec = {x: xDif/dif, y: yDif/dif};
+			var repulseFactor = mouseDist/dif;
+			rain[i].x += normVec.x*repulseFactor;
+		}
+	}
+}
+
+function calcDist(pos1, pos2){
+	xDif = pos1.x - pos2.x;
+	yDif = pos1.y - pos2.y;
+	return Math.sqrt(xDif*xDif + yDif*yDif);
+}
+
+function resetRainDrop(r){
+	r.y = -2;
+	r.x = r.xx;
+}
+
+function moveEverything(){
+	for(var i = 0; i < rain.length; i++){
+		avoidMouse(i);
+		rain[i].y += rain[i].yVel;	
+		if(rain[i].y > canvas.height){
+				resetRainDrop(rain[i]);
+		}
+	}
+}
+
+function drawEverything(){
+	ctx.fillStyle = 'rgba(0, 0, 0, .02)';
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+	for(var i = 0; i < rain.length; i++){
+		ctx.fillStyle = rain[i].col;
+		ctx.fillRect(rain[i].x, rain[i].y, 2, 2);	
+	}
+}
+
+</script>
+<br>Trail the sand with your mouse, click to change colors.
+</html>

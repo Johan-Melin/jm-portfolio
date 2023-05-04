@@ -1,0 +1,65 @@
+<html>
+<canvas id="gameCanvas" width = "800" height = "600"></canvas>
+
+<script>
+var canvas;
+var ctx;
+var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+var letter = {};
+var text = [];
+var count;
+var colorized = false;
+
+window.onload = function(){
+	canvas = document.getElementById('gameCanvas');	
+	ctx = canvas.getContext('2d');
+	canvas.style.background = 'black';
+
+	initText();
+	draw();
+}
+
+function initText(){
+	for(var i = 0; i < 100; i++){
+		letter = resetLetter();
+		text.push(letter);
+	}
+}
+
+function resetLetter(){
+	letter = {x: Math.random()*canvas.width, y: Math.random()*canvas.height, scale: 4+Math.random()*18, color: Math.random()*360}
+	letter.t = randomLetter();
+	return letter;
+}
+
+function draw(){
+	drawText();
+	requestAnimationFrame(draw);
+}
+
+function drawText(){
+	//ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.fillStyle = 'white';
+	var i = text.length;
+	while (i--){
+		text[i].y+=text[i].scale/5;
+		ctx.font = text[i].scale+"px arial";
+		if (colorized)
+			ctx.fillStyle = "hsla(" + text[i].color + ",100%,50%,0.75)"
+		if(text[i].y > canvas.height+14){
+			text[i] = resetLetter();
+			text[i].y = 0;
+		}
+		ctx.fillText(text[i].t, text[i].x, text[i].y);	
+	}
+}
+
+function randomLetter(){
+	return possible.charAt(Math.floor(Math.random() * possible.length));
+}
+
+</script>
+<br>
+<button type="button" onclick="colorized = !colorized">Colorize</button>
+</html>

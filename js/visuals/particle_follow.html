@@ -1,0 +1,131 @@
+<html>
+<canvas id="gameCanvas" width = "800" height = "600"></canvas>
+<style>
+body{font-family: "Courier";}
+</style>
+
+<script>
+var canvas;
+var ctx;
+var mousePos;
+var particles = [];
+var alpha = 1;
+var bw = true;
+var damping = 0.999;
+var paused = false;
+
+window.onload = function(){
+	canvas = document.getElementById('gameCanvas');	
+	ctx = canvas.getContext('2d');
+	ctx.strokeStyle = '#000000';
+	ctx.lineWidth = 2;
+	document.getElementById('sliderAlpha').value = alpha;	
+	document.getElementById('sliderDamp').value = damping;	
+	for (var i = 0; i < 200; i++) {
+		particles[i] = new Particle(Math.random() * canvas.width, Math.random() * canvas.height);
+	}
+	
+	var FPS = 60;
+	setInterval(move, 1000/FPS);
+
+	canvas.addEventListener('mousemove', function(evt){
+			mousePos = {x: evt.clientX, y: evt.clientY};
+		});
+		
+	canvas.addEventListener('mousedown', handleMouseClick);
+	document.addEventListener('keydown', handleMovement);
+}
+
+function handleMovement(evt){
+	var keyPressed = String.fromCharCode(event.keyCode);
+	if(event.keyCode == 32) {//space
+		pauseMove();
+	}
+}
+
+function pauseMove(){
+	paused = !paused;
+}
+
+function changeAlpha(v){
+	alpha = v;
+}
+
+function changeDamping(v){
+	damping = v;
+}
+
+function changeColors(){
+	bw = !bw;
+}
+
+function handleMouseClick(evt){
+
+	for (var i = 0; i < particles.length; i++) {
+		particles[i].repulse(mousePos.x, mousePos.y);
+	}
+}
+
+Particle.prototype.repulse = function(x, y) {
+	var dx = x - this.x;
+	var dy = y - this.y;
+	var dist = Math.sqrt(dx*dx + dy*dy);  
+	this.x += -10+Math.random()*20;
+	this.y += -10+Math.random()*20;
+}
+
+function Particle(x, y) {
+	this.x = this.oldX = x;
+	this.y = this.oldY = y;
+	var _c = Math.random()*300;
+	this.col = 'hsl('+ _c + ', 100%, 50%)';
+}
+
+Particle.prototype.integrate = function() {
+	var velX = (this.x - this.oldX) * damping;
+	var velY = (this.y - this.oldY) * damping;
+	this.oldX = this.x;
+	this.oldY = this.y;
+	this.x += velX;
+	this.y += velY;
+}
+
+Particle.prototype.attract = function(x, y) {
+	var dx = x - this.x;
+	var dy = y - this.y;
+	var dist = Math.sqrt(dx*dx + dy*dy);  
+	this.x += dx/dist;
+	this.y += dy/dist;
+}
+
+function move(){
+	if(paused)
+		return;
+	ctx.fillStyle = 'rgba(255, 255, 255, '+alpha+')';
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	for (var i = 0; i < particles.length; i++) {
+		particles[i].attract(mousePos.x, mousePos.y);
+		particles[i].integrate();
+		particles[i].draw();
+	}
+}
+
+Particle.prototype.draw = function() {
+	if(bw)
+		ctx.strokeStyle = 'black';
+	else
+		ctx.strokeStyle = this.col;
+	ctx.beginPath();
+	ctx.moveTo(this.oldX, this.oldY);
+	ctx.lineTo(this.x, this.y);
+	ctx.stroke();
+	ctx.strokeRect(0,0,canvas.width,canvas.height);
+}
+
+</script>
+<br>
+Alpha: <input id="sliderAlpha" type="range" min="0" max="1" step="0.01" onchange="changeAlpha(value)"/>
+Damping: <input id="sliderDamp" type="range" min="0.95" max="1" step="0.001" onchange="changeDamping(value)"/>
+<button type="button" onclick="changeColors()">Colors</button>
+<br>Click to repulse, press space to pause.
+</html>

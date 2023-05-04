@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Visuals</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Portfolio">
+  <meta name="author" content="Johan Melin">
+  
+  <!-- favicon -->
+  <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- needed by bootstrap.js -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!-- for dropdown menu -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <script>
+  $(document).on('click','.navbar-collapse.in',function(e) {
+    if( $(e.target).is('a:not(".dropdown-toggle")') ) {
+      $(this).collapse('hide');
+    }
+  });
+  
+  	window.onload = function(){
+		$.get("navbar.html", function(data){
+			$("#navbar").html(data);
+		})
+		$.get("footer.html", function(data){
+			$("#footer").html(data);
+		})
+	}
+  </script>
+</head>
+<body>
+
+<div id="navbar"></div>
+
+<section id='visuals'>
+<div class="container padding">
+  <h3>Visuals</h3>
+  <hr>
+  <div class="row text-center">
+	<div class="col-md-4">
+	  <a href="js/visuals/color_curves.html">
+	    <div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/color_curves.jpg" alt="color_curves">
+		  <p class="portfolio">Color Curves</p>
+	      <p>Trippy lines extruding from your mouse</p>
+	    </div>
+	  </a>
+	</div>
+	<div class="col-md-4">
+	  <a href="js/visuals/cloth.html">
+		<div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/cloth.jpg" alt="cloth">
+		  <p class="portfolio">Cloth</p>
+		  <p>An interactable simulation of cloth</p>
+	    </div>
+	  </a>
+	</div>
+	<div class="col-md-4">
+	  <a href="js/visuals/colorplode.html">
+	    <div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/colorplode.jpg" alt="colorplode">
+		  <p class="portfolio">Colorplode</p>
+		  <p>Colorful dots interact with your mouse</p>
+	    </div>
+	  </a>
+	</div>
+	<div class="col-md-4">
+	  <a href="js/visuals/circles.html">
+	    <div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/circles.jpg" alt="circles">
+		  <p class="portfolio">Circles</p>
+		  <p>Fun effect with just circles</p>
+	    </div>
+	  </a>
+	</div>
+	<div class="col-md-4">
+	  <a href="js/visuals/rings.html">
+	    <div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/rings.jpg" alt="rings">
+		  <p class="portfolio">Rings</p>
+		  <p>Water rings following your mouse</p>
+	    </div>
+	  </a>
+	</div>
+	<div class="col-md-4">
+	  <a href="js/visuals/particle_follow.html">
+	    <div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/particle_follow.jpg" alt="particle_follow">
+		  <p class="portfolio">Particle Follow</p>
+		  <p>Particles follows your mouse</p>
+	    </div>
+	  </a>
+	</div>
+	<div class="col-md-4">
+	  <a href="js/visuals/liquid_sand.html">
+	    <div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/liquid_sand.jpg" alt="liquid_sand">
+		  <p class="portfolio">Liquid Sand</p>
+		  <p>Matrix inspired sand falling</p>
+	    </div>
+	  </a>
+	</div>
+	<div class="col-md-4">
+	  <a href="js/visuals/neural.html">
+	    <div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/neural_pathway.png" alt="neural_pathway">
+		  <p class="portfolio">Neural Pathways</p>
+		  <p>Lines drawn between moving dots</p>
+	    </div>
+	  </a>
+	</div>
+	<div class="col-md-4">
+	  <a href="js/visuals/flow.html">
+	    <div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/flow.jpg" alt="flow">
+		  <p class="portfolio">Flow</p>
+		  <p>Windows screensaver inspired flow</p>
+	    </div>
+	  </a>
+	</div>
+	<div class="col-md-4">
+	  <a href="js/visuals/letters.html">
+	    <div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/snowing_letters.png" alt="snowing_letters">
+		  <p class="portfolio">Snowing Letters</p>
+		  <p>Colorful letters raining down</p>
+	    </div>
+	  </a>
+	</div>
+	<div class="col-md-4">
+	  <a href="js/visuals/dot.html">
+	    <div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/redline.jpg" alt="redline">
+		  <p class="portfolio">Red Dotted Lines</p>
+		  <p>Red dots emanating from the horizon</p>
+	    </div>
+	  </a>
+	</div>
+  </div><!-- row -->
+</div><!-- container -->
+</section>
+
+<!-- Footer -->
+<div id="footer"></div>
+
+</body>
+</html>

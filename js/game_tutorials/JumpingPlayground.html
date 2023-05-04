@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<body>
+<canvas id="gc" width=800 height=400></canvas>
+<script type="text/javascript" src="game_world_v1a.js"></script>
+<script type="text/javascript" src="player_controls_v1.js"></script>
+<script type="text/javascript" src="player_v2.js"></script>
+<script>
+
+window.onload=function(){
+	canv=document.getElementById('gc');
+	ctx=canv.getContext('2d');
+	setInterval(update, 1000/60);
+}
+
+function update(){
+	movePlayer();
+	drawWorld();
+	drawPlayer();
+	displayStartValues();
+}
+
+function displayStartValues(){
+	id_outputSpeed.value = player.speed;
+	id_inputSpeed.value = player.speed;
+	id_outputJumpSpeed.value = player.jumpSpeed;
+	id_inputJumpSpeed.value = player.jumpSpeed;
+	id_outputUpGravity.value = player.upGravity;
+	id_inputUpGravity.value = player.upGravity;
+	id_outputDownGravity.value = player.downGravity;
+	id_inputDownGravity.value = player.downGravity;
+}
+
+function randomizeValues(){
+	player.speed = (Math.floor(Math.random() * 10.0)+1).toFixed(1);
+	player.jumpSpeed = (Math.floor(Math.random() * 10.0)+1).toFixed(1);
+	player.upGravity = (Math.floor(Math.random() * 15.0)+5).toFixed(1);
+	player.downGravity = (Math.floor(Math.random() * 25.0)+5).toFixed(1);
+}
+
+</script>
+<br>
+<div style="float: left">Speed: 
+<output id="id_outputSpeed">0</output><br>
+<input type="range" id="id_inputSpeed" min="1" max="10" step="0.1" oninput=
+"id_outputSpeed.value = this.value;
+player.speed = this.value">
+</div>
+<div style="clear: both;"></div>
+
+<div style="float: left">Jump force:
+<output id="id_outputJumpSpeed">0</output><br>
+<input type="range" id="id_inputJumpSpeed" min="1" max="10" step="0.1" oninput=
+"id_outputJumpSpeed.value = this.value;
+player.jumpSpeed = this.value">
+</div>
+<div style="float: left">Up gravity: 
+<output id="id_outputUpGravity">0</output><br>
+<input type="range" id="id_inputUpGravity" min="5" max="20" step="0.1" oninput=
+"id_outputUpGravity.value = this.value;
+player.upGravity = this.value">
+</div>
+<div style="float: left">Down gravity: 
+<output id="id_outputDownGravity">0</output><br>
+<input type="range" id="id_inputDownGravity" min="5" max="30" step="0.1" oninput=
+"id_outputDownGravity.value = this.value;
+player.downGravity = this.value">
+</div>
+<div style="clear: both;"></div>
+
+<button type="button" onclick="randomizeValues()">Randomize!</button>
+<div>(Numbers show pixels/frame)</div>
+<br>
+
+</body>
+</html>

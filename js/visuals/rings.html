@@ -1,0 +1,48 @@
+<html>
+<canvas id="gameCanvas" width = "800" height = "600"></canvas>
+
+<script>
+var canvas;
+var ctx;
+var rings = [];
+
+window.onload = function(){
+
+	canvas = document.getElementById('gameCanvas');	
+	ctx = canvas.getContext('2d');
+
+	setInterval(function(){
+		draw();
+	}, 1000/60);	
+	
+	canvas.onmousemove = function (e) {
+		addRing();
+	}
+}
+
+function addRing(){
+	var ring = {x: event.clientX, y: event.clientY, radius: 5, alpha: 1}
+	rings.push(ring);
+}
+
+function draw(){
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	var i = rings.length;
+	while (i--){
+		ctx.strokeStyle = "rgba(0, 0, 0, "+rings[i].alpha+")";
+		drawBall(rings[i].x, rings[i].y, rings[i].radius);
+		rings[i].alpha -=0.0025;
+		rings[i].radius++;
+		if(rings[i].alpha <= 0)
+			rings.shift();
+	}			
+}
+
+function drawBall(centerX, centerY, radius){
+	ctx.beginPath();
+	ctx.arc(centerX, centerY, radius, 0, Math.PI*2, true) 
+	ctx.stroke();
+}
+
+</script>
+</html>

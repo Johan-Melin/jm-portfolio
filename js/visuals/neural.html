@@ -1,0 +1,131 @@
+<html>
+<canvas id="gameCanvas" width = "800" height = "600"></canvas>
+
+<script>
+var canvas;
+var canvasContext;
+var mousePos;
+var xDif;
+var yDif;
+var w;
+var h;
+
+var movePause = false;
+var dotPos = [];
+var dotLength = 20;
+
+window.onload = function(){
+
+	canvas = document.getElementById('gameCanvas');	
+	canvasContext = canvas.getContext('2d');
+
+	canvas.addEventListener('mousemove', function(evt){
+			mousePos = {x: evt.clientX, y: evt.clientY};
+		});
+
+	canvas.addEventListener('mousedown',
+		function(evt){
+			movePause = !movePause;
+		});
+
+	w = canvas.width;
+	h = canvas.height;
+	initDots();
+	
+	var FPS = 120;
+	setInterval(function(){
+		moveEverything();
+		drawEverything();
+	}, 1000/FPS);
+}
+
+function initDots(){
+	for(var i = 0; i < dotLength; i++){
+		var _x = Math.random()*w;
+		var _y = Math.random()*h;
+		dotPos[i] = { x: _x, y: _y, xVel: 0, yVel: 0 };
+		setVel(i);
+	}
+}
+
+function setVel(i){
+	dotPos[i].xVel = -1+Math.random()*3;
+	dotPos[i].yVel = -1+Math.random()*3;	
+}
+
+function moveEverything(){
+	for(var i = 0; i < dotLength; i++){
+			avoidMouse(i);
+			if (!movePause){
+				dotPos[i].x += dotPos[i].xVel;
+				dotPos[i].y += dotPos[i].yVel;
+			}
+		
+		if(dotPos[i].x < 0 || dotPos[i].x > w){
+			dotPos[i].xVel = -dotPos[i].xVel;
+		}
+		if(dotPos[i].y < 0 || dotPos[i].y > h){
+			dotPos[i].yVel = -dotPos[i].yVel;
+		}
+	}
+}
+
+function avoidMouse(i){
+	if(mousePos != null){
+	 	var mouseDist = 100;
+		var dif = calcDist(dotPos[i], mousePos);
+		if (dif > -mouseDist && dif < mouseDist){
+			var normVec = {x: xDif/dif, y: yDif/dif};
+			var repulseFactor = mouseDist/dif;
+			
+			var xTest = dotPos[i].x + normVec.x*repulseFactor;
+			if(xTest > 0 && xTest < w) {
+				dotPos[i].x += normVec.x*repulseFactor;
+			}
+			var yTest = dotPos[i].y + normVec.y*repulseFactor;
+			if(yTest > 0 && yTest < h) {
+				dotPos[i].y += normVec.y*repulseFactor;
+			}
+		}
+	}
+}
+
+function drawEverything(){
+	
+	//background
+	canvasContext.fillStyle = 'black';
+	canvasContext.fillRect(0, 0, w, h);
+
+	canvasContext.fillStyle = 'white'
+	for(var i = 0; i < dotPos.length; i++){
+		canvasContext.fillRect(dotPos[i].x, dotPos[i].y, 1, 1);
+	}
+	for(var i = 0; i < dotLength-1; i++){
+		for(var j = i+1; j < dotLength; j++){
+			canvasContext.beginPath();
+			
+			var dif = calcDist(dotPos[i], dotPos[j]);
+			var a = (1000/dif)/100;
+			if(dif < 100)
+				a = 1;
+			if(dif > 300)
+				a = 0;
+			canvasContext.strokeStyle = "rgba(255, 255, 255, "+a+")";
+			canvasContext.moveTo(dotPos[i].x, dotPos[i].y);
+			canvasContext.lineTo(dotPos[j].x, dotPos[j].y);
+			canvasContext.stroke();
+			canvasContext.closePath();
+		}
+	}
+}
+
+function calcDist(pos1, pos2){
+	xDif = pos1.x - pos2.x;
+	yDif = pos1.y - pos2.y;
+	return Math.sqrt(xDif*xDif + yDif*yDif);
+}
+
+</script>
+<br> Chase the dots with your mouse. 
+<br> Click to pause or resume automatic movement.
+</html>

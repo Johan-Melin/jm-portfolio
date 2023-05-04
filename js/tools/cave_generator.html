@@ -1,0 +1,116 @@
+<html>
+<canvas id="gameCanvas" width = "800" height = "600"></canvas>
+
+<script>
+var canvas;
+var canvasContext;
+
+var areaSize = 4;
+var cave = [];
+var caveXSize;
+var caveYSize;
+var currentTurn = 0;
+var maze = false;
+
+window.onload = function(){
+	canvas = document.getElementById('gameCanvas');	
+	canvasContext = canvas.getContext('2d');
+
+	canvas.addEventListener('mousedown', handleMouseClick);
+
+	initCave();
+	drawEverything();
+}
+
+function initCave(){
+	caveXSize = canvas.width/areaSize;
+	caveYSize = canvas.height/areaSize;
+	for(var x = 0; x< caveXSize; x++){
+		cave[x] = [];
+		for(var y = 0; y< caveYSize; y++){
+			var i = Math.random()*100 >> 0;
+			if(i < 47 || x == 0 || y == 0 || x == caveXSize-1 || y == caveYSize-1){
+				cave[x][y] = true;
+			}else{
+				cave[x][y] = false;
+			}
+		}
+	}
+}
+
+function handleMouseClick(evt){
+	if(currentTurn < 4){
+		smoothMap();
+		currentTurn++;
+	}else{
+		currentTurn = 0;
+		initCave();
+		drawEverything();
+	}
+}
+
+function smoothMap(){
+	for (var x = 0; x < caveXSize; x++) {
+		for (var y = 0; y < caveYSize; y++) {
+			var neighbourWallTiles = GetSurroundingWallCount(x, y);
+
+			if (neighbourWallTiles > 4)
+				cave[x][y] = isMaze(true);
+			else if(neighbourWallTiles < 4)
+				cave[x][y] = isMaze(false);
+		}
+	}
+	drawEverything();
+}
+
+function isMaze(value){
+	if(maze)
+		return !value;
+	return value;
+}
+
+function GetSurroundingWallCount(gridX, gridY) {
+	var wallCount = 0;
+	for(var neighbourX = gridX-1; neighbourX <= gridX +1; neighbourX++) {
+		for (var neighbourY = gridY-1; neighbourY <= gridY +1; neighbourY++) {
+			if (neighbourX >= 0 && neighbourX < caveXSize && neighbourY>= 0 && neighbourY < caveYSize){
+				if (neighbourX != gridX || neighbourY != gridY) {
+					if(cave[neighbourX][neighbourY] == true){
+						wallCount += 1;
+					}
+				}
+			} else {
+				wallCount++;
+			}
+		}
+
+	}
+	return wallCount;
+}
+
+function drawEverything(){	
+	canvasContext.fillStyle = 'white';
+	canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+
+	canvasContext.fillStyle = 'black'
+	for(var x = 0; x< caveXSize; x++){
+		for(var y = 0; y< caveYSize; y++){
+			if(cave[x][y] == true){
+				canvasContext.fillRect(x*areaSize, y*areaSize, areaSize, areaSize);		
+			}
+		}
+	}
+}
+
+function changeType(){
+	currentTurn = 0;
+	initCave();
+	drawEverything();
+	maze = !maze;
+}
+
+</script>
+<br>
+Click canvas to iterate and reset
+<button type="button" onclick="changeType()">Cave/Maze</button>
+</html>

@@ -1,0 +1,221 @@
+<html>
+<canvas id="gameCanvas" width = "800" height = "600"></canvas>
+
+<script>
+
+var clothHeight = 30;
+var clothWidth = 50;
+var spacing = 7;
+var gravity = 20;
+var points = [];
+var mouse = {};
+
+var colored = false;
+var showLines = true;
+
+window.onload = function(){
+
+	canvas = document.getElementById('gameCanvas');
+	ctx = canvas.getContext('2d');
+	ctx.fillStyle = 'black';
+	mouseActions();
+	
+	canvas.oncontextmenu = function (e) {
+		e.preventDefault();
+	};
+	
+	initCloth();
+	var FPS = 1000/60;
+	setInterval(function(){
+		moveEverything(FPS);
+	}, FPS);
+	draw();
+}
+
+function mouseActions(){
+	canvas.onmousedown = function (e) {
+		mouse.button = e.which;
+		mouse.down = true;
+	};
+
+	canvas.onmouseup = function (e) {
+		mouse.down = false;
+	};
+	
+	canvas.onmousemove = function (e) {
+		mouse.px = mouse.x;
+		mouse.py = mouse.y;
+		mouse.x = e.clientX,
+		mouse.y = e.clientY
+	};
+}
+
+function initCloth(){
+	var startX = canvas.width/2 - clothWidth * spacing/2;
+	for (var y = 0; y <= clothHeight; y++) {
+		for (var x = 0; x <= clothWidth; x++) {
+			var p = new Point(startX+x*spacing, y*spacing);
+			if(x != 0)
+				p.attach(points[points.length - 1]);
+			if(y != 0)
+				p.attach(points[x + (y - 1) * (clothWidth + 1)])
+			if(y == 0){
+				p.pinX = p.x;
+				p.pinY = p.y;
+			}
+			points.push(p);
+		}
+	}
+}
+
+var Point = function (x, y) {
+	this.x = x;
+	this.y = y;
+	this.px = x;
+	this.py = y;
+	this.vy = 0;
+	this.constraints = [];
+}
+
+function draw(){
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.beginPath();
+	var i = points.length;
+	if(colored)
+		colorize();
+	while (i--) 
+		points[i].draw();
+	if(showLines){
+		ctx.stroke();
+	}
+	requestAnimationFrame(draw);
+}
+
+Point.prototype.attach = function (point) {
+	this.constraints.push(
+		new Constraint(this, point)
+	);
+};
+
+Point.prototype.draw = function () {
+	if(!showLines){
+		ctx.fillStyle = 'black';
+		ctx.fillRect(this.x, this.y, 1, 1);
+	}
+		
+	var i = this.constraints.length;
+	while (i--) 
+		this.constraints[i].draw();
+};
+
+function colorize(){
+	ctx.fillStyle = 'red';
+    ctx.beginPath();
+    for(var i = 1; i <= clothHeight; i++) {
+        for(var j = 1; j <= clothWidth; j++) {
+			var p = points[i * (clothWidth + 1) + j];
+			if(p.constraints.length < 2) 
+				continue;
+
+			var pointUp = points[(i - 1) * (clothWidth + 1) + j];
+			var pointLeft = points[i * (clothWidth + 1) + (j - 1)];
+			var pointDiagonal = points[(i - 1) * (clothWidth + 1) + (j - 1)];
+			if(!pointUp.constraints.length || !pointLeft.constraints.length)
+				continue;
+
+			ctx.moveTo(p.x, p.y);
+			ctx.lineTo(pointLeft.x, pointLeft.y);
+			ctx.lineTo(pointDiagonal.x, pointDiagonal.y);
+			ctx.lineTo(pointUp.x, pointUp.y);
+			ctx.lineTo(p.x, p.y);
+        }
+    }
+    ctx.fill();
+}
+
+var Constraint = function (p1, p2) {
+    this.p1 = p1;
+    this.p2 = p2;
+    this.length = spacing;
+};
+
+Constraint.prototype.draw = function () {
+    ctx.moveTo(this.p1.x, this.p1.y);
+    ctx.lineTo(this.p2.x, this.p2.y);
+};
+
+function moveEverything(delta){
+	var accuracy = 3;
+	while(accuracy--){
+		var p = this.points.length;
+		while (p--){
+			if (points[p].pinX != null && points[p].pinY != null) {
+				points[p].x = points[p].pinX;
+				points[p].y = points[p].pinY;
+			}else{
+				var i = points[p].constraints.length;
+				while (i--) 
+					points[p].constraints[i].resolve();
+			}
+		}
+	}
+	i = this.points.length;
+	while (i--) 
+		points[i].update(delta);
+}
+
+Constraint.prototype.resolve = function () {
+	var difX = this.p1.x - this.p2.x,
+		difY = this.p1.y - this.p2.y,
+		dist = Math.sqrt(difX * difX + difY * difY),
+		diff = (this.length - dist) / dist;
+
+	//translation for each PointMass. They'll be pushed 1/2 the required distance to match their resting distances.
+	var px = difX * diff * 0.5;
+	var py = difY * diff * 0.5;
+
+	this.p1.x += px;
+	this.p1.y += py;
+	this.p2.x -= px;
+	this.p2.y -= py;
+};
+
+Point.prototype.update = function (delta) {
+	if (mouse.down)
+		mouseClick(this);
+	this.vy += gravity;
+
+	// Inertia: objects in motion stay in motion.
+	var nx = this.x + ((this.x - this.px) * .99);
+	var ny = this.y + ((this.y - this.py) * .99) + ((this.vy / 2) * delta/1000);
+
+	this.px = this.x;
+	this.py = this.y;
+
+	this.x = nx;
+	this.y = ny;
+	this.vy = 0
+}
+
+function mouseClick(p){
+	var difX = p.x - mouse.x,
+		difY = p.y - mouse.y,
+		dist = Math.sqrt(difX * difX + difY * difY);
+
+	if (mouse.button == 1) {
+
+		if (dist < 20) {
+			p.px = p.x - (mouse.x - mouse.px) * 1.8;
+			p.py = p.y - (mouse.y - mouse.py) * 1.8;
+		}
+
+	} else if (dist < 5) 
+		p.constraints = [];
+}
+
+</script>
+<br>
+<button type="button" onclick="colored = !colored">Colored</button>
+<button type="button" onclick="showLines = !showLines">Line/Dots</button>
+<br>Left click: drag, right click: cut.
+</html>

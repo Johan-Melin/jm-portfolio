@@ -1,0 +1,23 @@
+#center_box {
+	margin: auto;
+	width: 720px;
+	border: 3px solid green;
+	padding: 10px;
+}
+
+a {
+	font-family: sans-serif;
+	font-size: 30px;
+	text-decoration: none; 
+	color: #13B;
+	line-height: 1.4;
+	padding: 8;
+}
+
+p {
+	line-height: 1.4;
+}
+
+ a:hover { 
+	color: #26D;
+} 

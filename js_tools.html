@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Tools</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Portfolio">
+  <meta name="author" content="Johan Melin">
+  
+  <!-- favicon -->
+  <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- needed by bootstrap.js -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!-- for dropdown menu -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <script>
+  $(document).on('click','.navbar-collapse.in',function(e) {
+    if( $(e.target).is('a:not(".dropdown-toggle")') ) {
+      $(this).collapse('hide');
+    }
+  });
+  
+  	window.onload = function(){
+		$.get("navbar.html", function(data){
+			$("#navbar").html(data);
+		})
+		$.get("footer.html", function(data){
+			$("#footer").html(data);
+		})
+	}
+  </script>
+</head>
+<body>
+
+<div id="navbar"></div>
+
+<section id='tools'>
+<div class="container padding">
+  <h3>Tools</h3>
+  <hr>
+  <div class="row text-center">
+    <div class="col-md-4">
+	  <a href="js/tools/lag_comparison.html">
+	    <div class="portfolio-item">
+	  	  <img class="rounded-corners" src="preview_images/lag.png" alt="lag">
+	  	  <p class="portfolio">Lag Emulator</p>
+	  	  <p>Visualizes diffrent lag inputs</p>
+	    </div>
+	  </a>
+    </div>
+	<div class="col-md-4">
+	  <a href="js/tools/cave_generator.html">
+	    <div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/cave_generator.jpg" alt="cave_generator">
+		  <p class="portfolio">Cave Generator</p>
+	      <p>A tool to generate caves</p>
+	    </div>
+	  </a>
+	</div>
+	<div class="col-md-4">
+	  <a href="js/tools/map_generator.html">
+		<div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/map_generator.png" alt="map_generator">
+		  <p class="portfolio">Map Generator</p>
+		  <p>A visual tool generating dungeons</p>
+	    </div>
+	  </a>
+	</div>
+	<div class="col-md-4">
+	  <a href="js/tools/game_generator.html">
+	    <div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/game_gen.png" alt="game_gen">
+		  <p class="portfolio">Game Gen</p>
+		  <p>Generate an idea for a game</p>
+	    </div>
+	  </a>
+	</div>
+	<div class="col-md-4">
+	  <a href="js/tools/polish_english.html">
+	    <div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/polish_english.jpg" alt="game_gen">
+		  <p class="portfolio">Polish Pronunciation</p>
+		  <p>Get an approximate pronunciation in english</p>
+	    </div>
+	  </a>
+	</div>
+  </div><!-- row -->
+</div><!-- container -->
+</section>
+
+<!-- Footer -->
+<div id="footer"></div>
+
+</body>
+</html>

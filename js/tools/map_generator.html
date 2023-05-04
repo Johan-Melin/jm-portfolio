@@ -1,0 +1,91 @@
+<html>
+<canvas id="gameCanvas" width = "800" height = "600"></canvas>
+
+<script>
+var canvas;
+var canvasContext;
+
+var playerXSpeed = 5;
+var playerYSpeed = 5;
+var playerX = 400;
+var playerY = 300;
+var counter = 0;
+const TOTAL_AREA = 1800;
+
+var doneDrawing = false;
+
+window.onload = function(){
+	canvas = document.getElementById('gameCanvas');	
+	canvasContext = canvas.getContext('2d');
+
+	resetBg();
+	loop();
+
+	var FPS = 60;
+	setInterval(function(){
+		moveEverything();
+		drawEverything();
+	}, 1000/FPS);
+
+	canvas.addEventListener('mousedown', handleMouseClick);
+}
+
+function handleMouseClick(evt){
+	if(!doneDrawing){
+		doneDrawing = true;
+	}else{
+		counter = 0;
+		resetBg();
+		doneDrawing = false;
+	}
+}
+
+function resetBg(){
+		canvasContext.fillStyle = 'black';
+		canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function loop() {
+    var rand = Math.round(Math.random() * 50) + 10;
+    setTimeout(function() {
+            randomDir();
+            loop();  
+    }, rand);
+}
+
+function randomDir(){
+	playerXSpeed = -5+5*Math.floor(Math.random()*4);
+	if(playerXSpeed == 0 || playerXSpeed == 10){
+		playerXSpeed = 0;
+		playerYSpeed = -5+10*Math.floor(Math.random()*2);
+	}else{
+		playerYSpeed = 0;
+	}
+}
+
+function moveEverything(){
+	if(doneDrawing){
+		return;
+	}
+	if(++counter >= TOTAL_AREA){
+		doneDrawing = true;
+		return;
+	}
+	if(playerX+playerXSpeed < canvas.width && playerX+playerXSpeed > 0){
+		playerX += playerXSpeed;
+	}
+	if(playerY+playerYSpeed < canvas.height && playerY+playerYSpeed > 0){
+		playerY += playerYSpeed;
+	}
+}
+
+function drawEverything(){
+	
+	canvasContext.fillStyle = 'white'
+	canvasContext.fillRect(playerX, playerY, 4, 4);
+}
+
+</script>
+<br>
+Click to stop and reset
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head> 
+  <title>Stopwatch</title>
+  <meta name="description" content="A simple stopwatch timer">
+  <meta name="keywords" content="Stopwatch, Timer, Pomodoro, Alarm">
+  <meta name="author" content="Johan Melin">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="stopwatch.css">
+</head>
+<body>
+
+<div id="content">
+	<input type="button" class="button" id="btn" value="START" onclick="startTimer();">
+	<input type="button" class="button" id="btn2" value="RESET" onclick="resetTimer();">
+	<br>
+	<span id="time_display">0:00:00</span>
+	<span id="ms_display">000</span><br>
+</div>
+
+<script>
+var timerRunning = false;
+var startTime;
+var totalTime;
+var storedTime = 0;
+var time_display = document.getElementById('time_display');
+var btn = document.getElementById('btn');
+
+function startTimer(){
+	if(timerRunning){
+		btn.value = "CONTINUE";
+		stopTimer();
+		return;
+	}
+	btn.value = "PAUSE";
+	totalTime = Number(storedTime);
+	startTime = window.performance.now();
+	timerRunning = true;
+
+	function timerLoop(){
+		window.setTimeout(function(){
+			if(timerRunning){
+				var ms = time_display.innerHTML = (window.performance.now() - startTime + totalTime);
+				convertMsToTime(ms);
+				timerLoop();
+			}
+		}, 1000/60);
+	}
+
+	timerLoop();    
+}    
+
+function stopTimer(){
+	totalTime = window.performance.now() - startTime + totalTime;
+	storedTime = totalTime;
+	timerRunning = false;
+}   
+
+function resetTimer(){
+	totalTime = 0;
+	storedTime = 0;
+	convertMsToTime(0);
+	timerRunning = false;
+	btn.value = "START";
+}   
+
+function convertMsToTime(ms){
+	var mins = Math.floor(ms/1000/60);
+	var secs = Math.floor(ms/1000%60);
+	var hours = Math.floor(ms/1000/60/60);  
+	var msecs = Math.floor(ms%1000);  
+	if(mins < 10)
+		mins = "0" + mins;
+	if(secs < 10)
+		secs = "0" + secs;
+	if(msecs < 10)
+		msecs = "00" + msecs;
+	else if(msecs < 100)
+		msecs = "0" + msecs;
+	time_display.innerHTML = (hours+":"+mins+":"+secs);
+	ms_display.innerHTML = (msecs);
+	document.title =hours+":"+mins+":"+secs;
+}
+
+</script>
+</body>
+</html>

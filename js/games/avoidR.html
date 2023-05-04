@@ -1,0 +1,287 @@
+<html>
+<canvas id="gameCanvas" width = "800" height = "600"></canvas>
+
+<script>
+var canvas;
+var ctx;
+
+var player;
+var bg = [];
+var rows = 3;
+var cols = 3;
+var thick = 4;
+var spacing = 24;
+
+var score;
+var highscore;
+var proj = [];
+var startX;
+var startY;
+var colorCounter;
+var enemySpawning;
+var enemySpeed;
+var bgColor;
+var frontColor;
+var strokeEffect = true;
+var paused = false;
+
+window.onload = function(){
+
+	canvas = document.getElementById('gameCanvas');	
+	ctx = canvas.getContext('2d');
+	
+	if(localStorage.getItem("avoidRhighscore") == null){
+		localStorage.setItem("avoidRhighscore", 0);
+	}
+	highscore = localStorage.getItem("avoidRhighscore");
+	highscore = parseFloat(highscore);
+	
+	var w = (rows*spacing+thick)/2;
+	startX = canvas.width/2-w;
+	startY = canvas.height/2-w;
+
+	initBg();
+	restart();
+	
+	setInterval(function(){
+		drawEverything();
+	}, 1000/60);
+	
+	setInterval(scoreCounter, 100);
+	document.addEventListener('keydown', handleMovement);
+}
+
+function restart(){
+	score = 0.0;
+	enemySpawning = 500;
+	enemySpeed = 5;
+	colorCounter = 0;
+	paused = false;
+	setColors();
+	player = {x: 1, y: 1, w: spacing/2}
+	var i = proj.length;
+	while (i--){
+		proj[i].inMotion = false;
+		proj[i].x = -100;
+		proj[i].y = -100;
+	}
+	fireEnemy();
+}
+
+
+function scoreCounter(){
+	if(paused)
+		return
+	score += .1;
+	score = (Math.round(score * 10)/10);
+	colorCounter++;
+	if(colorCounter >= 100){
+		setColors();
+		colorCounter = 0;
+		if(enemySpawning > 200)
+			enemySpawning -= 50;
+			enemySpeed += 1;
+	}
+}
+
+function setColors(){
+	bgColor = '#'+Math.random().toString(16).slice(-6);
+	frontColor = '#'+Math.random().toString(16).slice(-6);
+}
+
+function fireEnemy(){
+	if(paused)
+		return
+	var enemy = {x: 0, y: 0, xVel: 0, yVel: 0, inMotion: true}
+	var _dir = getInt(4);
+	var offSet = thick+(spacing-thick-player.w)/2;
+	var yPos = getInt(cols)*spacing+startY;
+	var xPos = getInt(rows)*spacing+startX;
+	switch(_dir){
+	case 0: //left to right
+		enemy.y = yPos+offSet;
+		enemy.xVel = enemySpeed;
+		break;
+	case 1: //right to left
+		enemy.x = canvas.width;
+		enemy.y = yPos+offSet;
+		enemy.xVel = -enemySpeed;
+		break;
+	case 2: //top to bottom
+		enemy.x = xPos+offSet;
+		enemy.yVel = enemySpeed;
+		break;
+	case 3: //bottom to top
+		enemy.y = canvas.height;
+		enemy.x = xPos+offSet;
+		enemy.yVel = -enemySpeed;
+		break;
+	}
+	if(proj.length < 10)
+		proj.push(enemy);
+	else{
+		var i = proj.length;
+		while (i--){
+			if(proj[i].inMotion == false){
+				proj[i].x = enemy.x;
+				proj[i].y = enemy.y;
+				proj[i].xVel = enemy.xVel;
+				proj[i].yVel = enemy.yVel;
+				proj[i].inMotion = true;
+				break;
+			}
+		}
+	}
+	setTimeout(fireEnemy, enemySpawning);
+}
+
+function getInt(r){
+	return Math.floor(Math.random()*r);
+}
+
+function handleMovement(evt){
+	var keyPressed = String.fromCharCode(event.keyCode);
+	if(paused){
+		if(event.keyCode == 32 || event.keyCode == 0) {//space
+			restart();
+		}
+	}else{
+		if(event.keyCode == 37 || keyPressed == "A") {//left
+			if (player.x > 0) player.x-=1;
+		}
+		if(event.keyCode == 38 || keyPressed == "W") {//up
+			if (player.y > 0) player.y-=1;
+		}
+		if(event.keyCode == 39 || keyPressed == "D") {//right
+			if (player.x < cols-1) player.x+=1;
+		}
+		if(event.keyCode == 40 || keyPressed == "S") {//down
+			if (player.y < rows-1) player.y+=1;
+		}
+	}
+}
+
+function checkPos(){
+	if(player.x < 0)
+		player.x = cols-1;
+	if(player.x > cols-1)
+		player.x = 0;
+	if(player.y < 0)
+		player.y = rows-1;
+	if(player.y > rows-1)
+		player.y = 0;
+}
+
+function initBg(){
+	for (var y = 0; y <= rows; y++) {
+		for (var x = 0; x <= cols; x++) {
+			var p = {x: startX+x*spacing, y: startY+y*spacing};
+			bg.push(p);
+		}
+	}
+}
+
+function drawEnemies(){
+	var i = proj.length;
+	while (i--){
+		ctx.fillRect(proj[i].x, proj[i].y, player.w, player.w);
+		if(strokeEffect)
+			ctx.strokeRect(proj[i].x, proj[i].y, player.w, player.w);
+	}
+}
+
+function moveEnemies(){
+	var i = proj.length;
+	while (i--){
+		if(proj[i].inMotion){
+			proj[i].x += proj[i].xVel;
+			proj[i].y += proj[i].yVel;
+			
+			if(proj[i].x < 0 || proj[i].x > canvas.width || proj[i].y < 0 || proj[i].y > canvas.height){
+				proj[i].inMotion = false;
+				proj[i].x = -100;
+				proj[i].y = -100;
+			}
+
+			checkHit(proj[i]);
+		}
+	}
+}
+
+function drawEverything(){
+	ctx.fillStyle = bgColor;
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	
+	ctx.fillStyle = frontColor;
+	drawBg();
+	drawPlayer();
+	drawEnemies();
+	
+	ctx.font="16px Arial";
+	ctx.textAlign = "right";
+	ctx.fillStyle = 'black';
+	ctx.fillText("Highcore: "+highscore.toFixed(1), canvas.width-10, 24);
+	ctx.fillStyle = frontColor;
+	
+	ctx.font="36px Arial";
+	ctx.textAlign = "center";
+	ctx.fillText(score.toFixed(1), canvas.width/2, 210);
+	if(strokeEffect)
+		ctx.strokeText(score.toFixed(1), canvas.width/2, 210);
+			
+	if(paused){
+		ctx.fillText("Press space to restart", canvas.width/2, 410);
+		if(strokeEffect)
+			ctx.strokeText("Press space to restart", canvas.width/2, 410);
+		return;
+	}	
+
+	moveEnemies();
+}
+
+function drawBg(){
+	var i = bg.length;
+	while (i--){
+		ctx.fillRect(bg[i].x, bg[i].y, thick, thick);
+		if(strokeEffect)
+			ctx.strokeRect(bg[i].x, bg[i].y, thick, thick);
+	}
+}
+
+function drawPlayer(){
+	var posX = startX+player.x*spacing+thick;
+	var posY = startY+player.y*spacing+thick;
+	ctx.fillRect(posX, posY, spacing-thick, spacing-thick);
+	if(strokeEffect)
+		ctx.strokeRect(posX, posY, spacing-thick, spacing-thick);
+	ctx.fillStyle = bgColor;
+	var offSet = (spacing-thick-player.w)/2;
+	ctx.fillRect(posX+offSet, posY+offSet, player.w, player.w);
+	if(strokeEffect)
+		ctx.strokeRect(posX+offSet, posY+offSet, player.w, player.w);
+	ctx.fillStyle = frontColor;
+}
+
+function checkHit(enemy){
+	var posX = startX+player.x*spacing+thick;
+	var posY = startY+player.y*spacing+thick;
+	if (posX < enemy.x + player.w &&
+		posX + spacing-thick > enemy.x &&
+		posY < enemy.y + player.w &&
+		posY + spacing-thick > enemy.y) {
+		checkScore();
+		paused = true;
+	}
+}
+
+function checkScore(){
+	if(score > highscore){
+		highscore = score;
+		localStorage.setItem("avoidRhighscore", highscore);
+	}
+}
+
+</script>
+<br>Play with WASD or ARROW keys. Inspired by <a href="http://store.steampowered.com/app/350630">Dodge</a>
+<br><button type="button" onclick="strokeEffect = !strokeEffect">Stroke Effect</button>
+</html>

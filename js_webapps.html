@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Web Apps</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Portfolio">
+  <meta name="author" content="Johan Melin">
+  
+  <!-- favicon -->
+  <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- needed by bootstrap.js -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!-- for dropdown menu -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <script>
+  $(document).on('click','.navbar-collapse.in',function(e) {
+    if( $(e.target).is('a:not(".dropdown-toggle")') ) {
+      $(this).collapse('hide');
+    }
+  });
+  
+  	window.onload = function(){
+		$.get("navbar.html", function(data){
+			$("#navbar").html(data);
+		})
+		$.get("footer.html", function(data){
+			$("#footer").html(data);
+		})
+	}
+  </script>
+</head>
+<body>
+
+<div id="navbar"></div>
+
+<section id='webapps'>
+<div class="container padding">
+  <h3>Web Apps</h3>
+  <hr>
+  <div class="row text-center">
+	<div class="col-md-4">
+	  <a href="js/webapps/language_numbers.html">
+	    <div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/language_numbers.png" alt="numbers">
+		  <p class="portfolio">Language Numbers</p>
+	      <p>Learn numbers 1-1000 in 56 languages</p>
+	    </div>
+	  </a>
+	</div>
+	<div class="col-md-4">
+	  <a href="js/webapps/stopwatch.html">
+	    <div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/stopwatch.jpg" alt="stopwatch">
+		  <p class="portfolio">Stopwatch</p>
+	      <p>A simple stopwatch timer</p>
+	    </div>
+	  </a>
+	</div>
+	<div class="col-md-4">
+	  <a href="js/webapps/countdown.html">
+		<div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/countdown.jpg" alt="countdown">
+		  <p class="portfolio">Countdown</p>
+		  <p>A countdown timer with pomodoro buttons</p>
+	    </div>
+	  </a>
+	</div>
+	<div class="col-md-4">
+	  <a href="js/webapps/stickys/">
+	    <div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/stickynotes.jpg" alt="stickynotes">
+		  <p class="portfolio">Sticky Notes</p>
+	      <p>Stick notes on a corkboard (web sql)</p>
+	    </div>
+	  </a>
+	</div>
+	<div class="col-md-4">
+	  <a href="js/webapps/quickvidz/">
+		<div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/quickvidz.jpg" alt="quickvidz">
+		  <p class="portfolio">Quick Vidz</p>
+		  <p>Youtube search without distractions</p>
+	    </div>
+	  </a>
+	</div>
+	<div class="col-md-4">
+	  <a href="js/webapps/todos/">
+	    <div class="portfolio-item">
+		  <img class="rounded-corners" src="preview_images/mobiletodo.jpg" alt="mobiletodo">
+		  <p class="portfolio">Mobile ToDo</p>
+		  <p>Simple todo app for your mobile device</p>
+	    </div>
+	  </a>
+	</div>
+  </div><!-- row -->
+</div><!-- container -->
+</section>
+
+<!-- Footer -->
+<div id="footer"></div>
+
+</body>
+</html>

@@ -1,0 +1,103 @@
+<html>
+<canvas id="gameCanvas" width = "800" height = "600"></canvas>
+
+<script>
+var canvas;
+var ctx;
+
+var mousePos;
+var particles = [];
+var spacing = 5;
+var repulse = false;
+var trail = false;
+var lastLoop = new Date;
+var imageData;
+var data;
+var nrParticles;
+
+window.onload = function(){
+
+	canvas = document.getElementById('gameCanvas');	
+	ctx = canvas.getContext('2d');
+	
+	initParticles();
+	
+	setInterval(function(){
+		move();
+		draw();
+	}, 1000/60);
+
+	canvas.addEventListener('mousemove', function(evt){
+			mousePos = {x: evt.clientX, y: evt.clientY};
+		});
+
+	canvas.addEventListener('mousedown', changeRepulse);
+}
+
+function changeRepulse(){
+	repulse = !repulse;
+}
+
+function initParticles(){
+	for(var x = 0; x < canvas.width/spacing; x++){
+		var _col = 'hsl('+ 100+x*2 + ', 100%, 50%)';
+		for(var y = 0; y < canvas.height/spacing; y++){
+			var p = {startX: x*spacing, x: x*spacing, startY: y*spacing, y: y*spacing, color: _col};
+			particles.push(p);
+		}
+	}
+}
+
+function avoidMouse(i){
+	if(mousePos != null){
+	 	var mouseDist = 100;
+		var dif = calcDist(particles[i], mousePos);
+		if (dif > -mouseDist && dif < mouseDist){
+			var normVec = {x: xDif/dif, y: yDif/dif};
+			var repulseFactor = mouseDist/dif;
+			particles[i].x += normVec.x*repulseFactor;
+			particles[i].y += normVec.y*repulseFactor;
+		}else{
+			if(repulse){
+				particles[i].x += (particles[i].x-particles[i].startX)/50;
+				particles[i].y += (particles[i].y-particles[i].startY)/50;			
+			}else{
+				particles[i].x += (particles[i].startX-particles[i].x)/10;
+				particles[i].y += (particles[i].startY-particles[i].y)/10;
+			}
+		}
+	}
+}
+
+function calcDist(pos1, pos2){
+	xDif = pos1.x - pos2.x;
+	yDif = pos1.y - pos2.y;
+	return Math.sqrt(xDif*xDif + yDif*yDif);
+}
+
+function move(evt){
+	for(var i = 0; i < particles.length; i++){
+		avoidMouse(i);
+	}
+}
+
+function draw(){
+	if(trail)
+		ctx.fillStyle = 'rgba(0, 0, 0, .1)';
+	else	
+		ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	
+	for(var i = 0; i < particles.length; i++){
+		ctx.fillStyle = particles[i].color;
+		ctx.fillRect(particles[i].x, particles[i].y, 2, 2);	
+	}
+	var thisLoop = new Date;
+    var fps = 1000 / (thisLoop - lastLoop);
+    lastLoop = thisLoop;
+}
+
+</script>
+<br>Click mouse to change repulse/attact.<br>
+<button type="button" onclick="trail = !trail">Trail</button>
+</html>

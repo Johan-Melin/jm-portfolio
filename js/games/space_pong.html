@@ -1,0 +1,267 @@
+<html>
+<canvas id="gameCanvas" width = "800" height = "600"></canvas>
+<script>
+var canvas;
+var ctx;
+var w;
+var h;
+
+var scores;
+var screen;
+var stars = [];
+var dust = [];
+var dustAlpha;
+
+var ball;
+var ballTrail = [];
+var paddle1Y = 250;
+var paddle2Y = 250;
+const PADDLE = {h: 100, w: 10, spacing: 10};
+
+window.onload = function(){
+
+	canvas = document.getElementById('gameCanvas');	
+	canvas.style.cursor = 'none';
+	ctx = canvas.getContext('2d');
+	ctx.font="30px Arial";
+	ctx.textAlign = "center";
+	ctx.strokeStyle = 'white';
+
+	w = canvas.width;
+	h = canvas.height;
+	
+	scores = {p1: 0, p2: 0, win: 10};
+	ball = {xVel: -4};
+	ballReset();
+	screen = {start: true, win: false, pause: true};
+
+	initStars();
+	
+	var FPS = 120;
+	setInterval(function(){
+		moveEverything();
+		drawEverything();
+	}, 1000/FPS);
+
+	canvas.addEventListener('mousedown', handleMouseClick);
+	
+	canvas.addEventListener('mousemove', 
+		function(evt){
+			paddle1Y = evt.clientY -PADDLE.h/2;
+		});
+}
+
+function initStars(){
+	for(var i = 0; i < 50; i++){
+		var _x = Math.random()*canvas.width;
+		var _y = Math.random()*canvas.height;
+		var _r = 0.5+Math.random();
+		var _z = 1+Math.random();
+		var _col = 'white';
+		
+		stars[i] = {x: _x, y: _y, r:_r, z: _z};
+	}
+}
+
+function showDust(){
+	dustAlpha = 1;
+	for(var i = 0; i < 10; i++){
+		var _x = ball.x -10 + Math.random()*20;
+		var _y = ball.y -10 + Math.random()*20;
+		var _r = 2+Math.random();
+		dust[i] = {x: _x, y: _y, r:_r};
+	}
+}
+
+function handleMouseClick(evt){
+	if(screen.win || screen.start){
+		scores.p1 = 0;
+		scores.p2 = 0;
+		screen.win = false;
+		screen.start = false;
+	}else if (screen.pause){
+		screen.pause = false;
+	}
+}
+
+function ballReset(){
+	if(scores.p1 >= scores.win || 
+	   scores.p2 >= scores.win){
+		screen.win = true;
+	}
+	ball.xVel = -ball.xVel;
+	ball.yVel = -5+Math.random()*10;
+	ball.x = w/2;
+	ball.y =h/2;
+	for(var i = 0; i < 10; i++){
+		ballTrail[i] = {x: ball.x, y: ball.y};
+	}
+	screen.pause = true;
+}
+
+function computerMovement(){	
+	var cntr = paddle2Y + (PADDLE.h/2);
+	var ballOffset = 25;
+	var paddle2Speed = 4;
+	if(ball.xVel >0){
+		if(cntr < ball.y - ballOffset){
+			paddle2Y += paddle2Speed;
+		}else if(cntr > ball.y + ballOffset){
+			paddle2Y -= paddle2Speed;
+		}
+	}else{
+		if(cntr < h/2){
+			paddle2Y += paddle2Speed;
+		}else if(cntr > h/2){
+			paddle2Y -= paddle2Speed;
+		}
+	}
+}
+
+function moveEverything(){
+
+	if(screen.win || screen.pause|| screen.start ){
+		return;
+	}
+
+	ball.x += ball.xVel;
+	ball.y += ball.yVel;
+
+	computerMovement();
+
+	if(ball.x < 0){
+		scores.p2++;
+		ballReset();
+	}
+	
+	if(ball.x > w){
+		scores.p1++;
+		ballReset();
+	}
+
+	if(ball.x > 20 && ball.x < 30){
+		checkHit(paddle1Y);
+	}
+
+	if(ball.x > w-40 && ball.x < w-30){
+		checkHit(paddle2Y);
+	}
+
+	if(ball.y > h || ball.y < 0)
+		ball.yVel = -ball.yVel;
+		
+	for(var i = 0; i < stars.length; i++){
+		stars[i].y -= ball.yVel/16*stars[i].z;
+		stars[i].x -= ball.xVel/16*stars[i].z;
+	}
+	
+	ballTrail[0].x = ball.x;
+	ballTrail[0].y = ball.y;
+	for(var i = 9; i > 0; i--){
+		ballTrail[i].x = ballTrail[i-1].x;
+		ballTrail[i].y = ballTrail[i-1].y;		
+	}
+	
+	if(dust != null){
+		for(var i = 0; i < dust.length; i++){
+			dust[i].x += ball.xVel/4;
+			dust[i].y += ball.yVel*Math.random();
+		}
+	}
+}
+
+function checkHit(paddleY){
+		if(ball.y > paddleY && ball.y < paddleY+PADDLE.h){
+			ball.xVel = -ball.xVel;
+
+			var deltaY = ball.y - (paddleY + PADDLE.h/2);
+			ball.yVel = deltaY * 0.15;
+			showDust();
+		}
+}
+
+function drawNet(){
+	for(var i = 0; i<h; i+=40){
+		ctx.fillRect(w/2-1, 10+i, 2, 20);
+	}
+}
+
+function drawEverything(){
+	
+	ctx.fillStyle = 'black';
+	ctx.fillRect(0, 0, w, h);
+
+	ctx.fillStyle = 'white'
+	
+	if(screen.start){
+		ctx.fillText("Use your mouse to steer the left paddle", w/2, 200);
+		ctx.fillText("First to reach "+scores.win+" points wins", w/2, 300);
+		ctx.fillText("Click to continue", w/2, 400);
+		return;
+	}
+
+	ctx.fillText(scores.p1, 100, 100);
+	ctx.fillText(scores.p2, w-100, 100);
+
+	if(screen.win){
+		if(scores.p1 >= scores.win){
+			ctx.fillText("Left Player Won!", w/2, 200);
+		}else{
+			ctx.fillText("Right Player Won!",w/2, 200);
+		}
+		ctx.fillText("Click to continue", w/2, 400);
+		return;
+	}
+
+	for(var i = 0; i < stars.length; i++){
+		ctx.fillRect(stars[i].x, stars[i].y, stars[i].r, stars[i].r);	
+	}
+	
+	ctx.fillStyle = 'rgb(20, 20, 20)';
+	drawNet();
+	drawPaddle(paddle1Y, false);
+	drawPaddle(paddle2Y, true);
+	
+	ctx.fillStyle = 'white'
+	drawBall(ball.x, ball.y, 10);
+	
+	if(dust != null){
+		dustAlpha = dustAlpha > 0 ? dustAlpha -0.02 : 0;
+		ctx.fillStyle = 'rgba(255, 255, 255, '+dustAlpha+')';
+		for(var i = 0; i < dust.length; i++){
+			ctx.fillRect(dust[i].x, dust[i].y, dust[i].r, dust[i].r);
+		}
+	}
+
+	for(var i = 0; i < 10; i++){
+		ctx.fillStyle = 'rgba(255, 255, 255, '+1/i+')';
+		drawBall(ballTrail[i].x, ballTrail[i].y, 10-i/2)
+	}
+}
+
+function drawPaddle(y, right){
+	ctx.beginPath();
+	var s = PADDLE.spacing;
+	var pW = PADDLE.w;
+	if(right){
+		s = w-PADDLE.spacing -pW;
+		pW = -pW;
+	}
+	ctx.moveTo(s, y)
+	ctx.lineTo(s, y+PADDLE.h);
+	ctx.lineTo(s+pW, y+PADDLE.h);
+	ctx.bezierCurveTo(s+pW*2, y+PADDLE.h, s+pW*2, y, s+pW, y)
+	ctx.closePath();
+	ctx.fill();
+	ctx.stroke();
+}
+
+function drawBall(centerX, centerY, radius){
+	ctx.beginPath();
+	ctx.arc(centerX, centerY, radius, 0, Math.PI*2, true) 
+	ctx.fill();
+}
+
+</script>
+<br>Click to lauch the ball
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<body>
+<div id="canvas_div_no_cursor">
+	<canvas id="gc" width=800 height=600"></canvas>
+</div>
+<script>
+	document.getElementById('canvas_div_no_cursor').style.cursor = "none";
+	var mouseX, mouseY;
+	var oldX, oldY;
+	var lag = 40;
+	var textColor;
+	event = event || window.event;
+	
+	window.onload=function(){
+		canv=document.getElementById('gc');
+		ctx=canv.getContext('2d');
+		refreshScreen();
+		setDelay(document.getElementById("slider").value);
+	}
+	
+	document.onmousemove = handleMouseMove;
+    function handleMouseMove(event) {
+		event = event || window.event;
+		refreshScreen();
+		mouseX = event.clientX-12;
+		mouseY = event.clientY-12;
+		drawCrosshair(event.clientX-12, event.clientY-12);
+		drawCrosshair(oldX, oldY);
+		setTimeout(function() {
+			drawXhair(event.clientX-12, event.clientY-12);
+		}, lag)
+	}
+	
+	function drawXhair(x, y){
+		refreshScreen();
+		drawCrosshair(mouseX, mouseY);
+		drawCrosshair(x, y);
+		oldX = x;
+		oldY = y;
+	}
+	
+	function drawCrosshair(x, y){
+		ctx.fillStyle="#111";
+		ctx.fillRect(x-8, y, 6, 2);
+		ctx.fillRect(x+4, y, 6, 2);
+		ctx.fillRect(x, y-8, 2, 6);
+		ctx.fillRect(x, y+4, 2, 6);
+	}
+	
+	function refreshScreen(){
+		ctx.fillStyle="#EEE";
+		ctx.fillRect(0, 0, canv.width, canv.height);		
+		ctx.fillStyle=textColor;
+		ctx.fillText(lag+"ms",50,50);	
+	}
+	
+	function setDelay(value){
+		var r = Math.floor(255 * (value / 400));
+		var g = Math.floor(255 - (255 * (value / 400)));
+		textColor = 'rgb(' + r + ',' + g + ',' + 0 + ')'; 
+		lag=value;
+	}
+	
+</script>
+<br /><input id="slider" type="range" min="0" max="400" step="20" value ="40"  onchange="setDelay(value)"/>
+</body>
+</html>

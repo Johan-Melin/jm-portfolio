@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head> 
+  <title>Countdown</title>
+  <meta name="description" content="A simple countdown timer">
+  <meta name="keywords" content="Countdown, Timer, Pomodoro, Alarm">
+  <meta name="author" content="Johan Melin">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="countdown.css">
+  </head>
+<body>
+
+<div id="content">
+	<input type="button" class="button" id="start_btn" value="START" onclick="startTimer();">
+	<input type="button" class="button" id="reset_btn" value="RESET" onclick="resetTimer();">
+	<br>
+	<span id="hour_display" class="time_display">0</span><span class="symbol_display">:</span><!--
+	--><span id="minute_display" class="time_display">00</span><span class="symbol_display">:</span><!--
+	--><span id="second_display" class="time_display">00</span>
+	<span id="ms_display">000</span><br>
+	<p>Click numbers or buttons to change time</p>
+	<input type="button" class="small_button" id="add_5" value="5 min" onclick="add5();">
+	<input type="button" class="small_button" id="add_25" value="25 min" onclick="add25();">
+	<br>
+</div>
+
+<script>
+var timerStarted = false;
+var timerRunning = false;
+var startTime;
+var totalTime;
+var storedTime = 0;
+var stopwatchTime = 1500;
+var audio = new Audio('countdown/alarm.mp3');
+
+var startBtn = document.getElementById('start_btn');
+var hour_display = document.getElementById('hour_display');
+var minute_display = document.getElementById('minute_display');
+var second_display = document.getElementById('second_display');
+var time_display = document.getElementsByClassName('time_display');
+var btn_5min = document.getElementById('add_5');
+var btn_25min = document.getElementById('add_25');
+
+function startTimer(){
+	if(timerRunning){
+		startBtn.value = "CONTINUE";
+		stopTimer();
+		return;
+	}
+	
+	startBtn.value = "PAUSE";
+	totalTime = Number(storedTime);
+	startTime = window.performance.now();
+	timerRunning = true;
+	timerStarted = true; 
+	btn_5min.disabled = true;	
+	btn_25min.disabled = true;	
+
+	function timerLoop(){
+		window.setTimeout(function(){
+			if(timerRunning){
+				var ms = stopwatchTime*1000-(window.performance.now() - startTime + totalTime);
+				if(ms <= 0){
+					startBtn.disabled = true;
+					ms = 0;
+					convertMsToTime(ms);
+					timerRunning = false;
+					audio.play();
+				}					
+				convertMsToTime(ms);
+				timerLoop();
+			}
+		}, 1000/60);
+	}
+
+	timerLoop();    
+}    
+
+function stopTimer(){
+	totalTime = window.performance.now() - startTime + totalTime;
+	storedTime = totalTime;
+	timerRunning = false;
+}   
+
+function resetTimer(){
+	totalTime = 0;
+	storedTime = 0;
+	convertMsToTime(stopwatchTime*1000);
+	timerRunning = false;
+	timerStarted = false;
+	startBtn.disabled = false;
+	btn_5min.disabled = false;	
+	btn_25min.disabled = false;	
+	startBtn.value = "START";
+}   
+
+function convertMsToTime(ms){
+	var hours = Math.floor(ms/1000/60/60);  
+	hour_display.innerHTML = (hours);
+	ms-=hours*60*60*1000;
+	
+	var mins = Math.floor(ms/1000/60);
+	if(mins < 10)
+		mins = "0" + mins;
+	minute_display.innerHTML = (mins);
+	
+	var secs = Math.floor(ms/1000%60);	
+	if(secs < 10)
+		secs = "0" + secs;
+	second_display.innerHTML = (secs);
+	
+	var msecs = Math.floor(ms%1000);  
+	if(msecs < 10)
+		msecs = "00" + msecs;
+	else if(msecs < 100)
+		msecs = "0" + msecs;
+	ms_display.innerHTML = (msecs);
+	
+	document.title =hours+":"+mins+":"+secs;
+}
+
+convertMsToTime(stopwatchTime*1000);
+
+//Edit time-----------------------------
+hour_display.addEventListener("click", editHours);
+minute_display.addEventListener("click", editMinutes);
+second_display.addEventListener("click", editSeconds);
+
+function editHours(){
+	if (timerStarted)
+		return;
+    var val = prompt("Enter hour value");
+    if (val !=null && val >=0 && val <= 99) {
+		var temp = parseInt(hour_display.textContent);
+		stopwatchTime += (val - temp)*60*60;
+        convertMsToTime(stopwatchTime*1000)
+    }
+}
+
+function editMinutes(){
+	if (timerStarted)
+		return;
+    var val = prompt("Enter minutes value");
+    if (val !=null && val >=0 && val <= 59) {
+		var temp = parseInt(minute_display.textContent);
+		stopwatchTime += (val - temp)*60;
+        convertMsToTime(stopwatchTime*1000)
+    }
+}
+
+function editSeconds(){
+	if (timerStarted)
+		return;
+    var val = prompt("Enter seconds value");
+    if (val !=null && val >=0 && val <= 59) {
+		var temp = parseInt(second_display.textContent);
+		stopwatchTime += val - temp;
+        convertMsToTime(stopwatchTime*1000)
+    }
+}
+
+function add5(){
+	stopwatchTime = 5*60;
+	convertMsToTime(stopwatchTime*1000);
+}
+
+function add25(){
+	stopwatchTime = 25*60;
+	convertMsToTime(stopwatchTime*1000);
+}
+
+</script>
+</body>
+</html>

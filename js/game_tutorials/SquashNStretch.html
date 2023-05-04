@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<body>
+<canvas id="gc" width=800 height=400></canvas>
+<script type="text/javascript" src="SquashNStretch.js"></script>
+<script>
+var groundHeight = 200;
+var platforms = [];
+var currentY = 0;
+
+window.onload=function(){
+	canv=document.getElementById('gc');
+	ctx=canv.getContext('2d');
+	setInterval(update, 1000/60);
+}
+
+function update(){
+	movePlayer();
+	drawWorld();
+	drawPlayer();
+	currentY = player.y;
+}
+
+function drawWorld(){
+	//sky
+	ctx.fillStyle="rgb(64, 128, 192)";
+	ctx.fillRect(0, 0, canv.width, canv.height);
+	
+	//platforms
+	ctx.fillStyle="rgb(48, 96, 144)";
+	ctx.fillRect(0, groundHeight, canv.width, canv.height);
+	ctx.strokeRect(-1, groundHeight, canv.width+2, canv.height);
+ }
+
+var controls = {
+	jump:  false,
+	left:  false,
+	right: false,
+	shoot: false
+}
+
+document.onkeydown = function(e) {
+	e = e || window.event;
+	if( e.keyCode == 17)
+		controls.ctrl = true;
+	if( e.keyCode == 32 || 
+		e.keyCode == 38 || 
+		e.keyCode == 87)
+		controls.jump = true;
+	if( e.keyCode == 37 || 
+		e.keyCode == 65)
+		controls.left = true;
+	if( e.keyCode == 39 || 
+		e.keyCode == 68)
+		controls.right = true;
+}
+
+document.onkeyup = function(e) {
+	e = e || window.event;
+	if( e.keyCode == 17)
+		controls.ctrl = false;
+	if( e.keyCode == 32 || 
+		e.keyCode == 38 || 
+		e.keyCode == 87)
+		controls.jump = false;
+	if( e.keyCode == 37 || 
+		e.keyCode == 65)
+		controls.left = false;
+	if( e.keyCode == 39 || 
+		e.keyCode == 68)
+		controls.right = false;
+}
+
+</script>
+</body>
+</html>
