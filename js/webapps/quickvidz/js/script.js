@@ -63,7 +63,7 @@ function displaySearch(token, q){
 			q: q,
 			pageToken: token,
 			type:'video',
-			key: 'AIzaSyA5jM1W9pQ5Ch93MF_uTZNJDQ9Gfz7C9kw'},
+			key: ''},
 			function(data){
 				var nextPageToken = data.nextPageToken;
 				var prevPageToken = data.prevPageToken;
