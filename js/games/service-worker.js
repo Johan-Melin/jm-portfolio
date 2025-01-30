@@ -23,7 +23,27 @@ self.addEventListener('fetch', event => {
                 if (response) {
                     return response; // Return the cached version
                 }
-                return fetch(event.request); // Fetch from network if not in cache
+                return fetch(event.request).then(networkResponse => {
+                    // Check if we received a valid response
+                    if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+                        return networkResponse;
+                    }
+
+                    // Clone the response
+                    const responseToCache = networkResponse.clone();
+
+                    caches.open(CACHE_NAME)
+                        .then(cache => {
+                            cache.put(event.request, responseToCache);
+                        });
+
+                    return networkResponse;
+                }).catch(() => {
+                    // Fallback to avoidR.html if the request fails (e.g., offline)
+                    if (event.request.mode === 'navigate') {
+                        return caches.match('avoidR.html');
+                    }
+                });
             })
     );
 });
