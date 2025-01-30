@@ -2,6 +2,9 @@ const CACHE_NAME = 'avoidR-cache-v1';
 const urlsToCache = [
     'avoidR.html',
     'avoidR.js',
+    'manifest.json',
+    'icon-192x192.png',
+    'icon-512x512.png'
 ];
 
 self.addEventListener('install', event => {
