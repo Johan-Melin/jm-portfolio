@@ -13,10 +13,11 @@ let fps = 60;
 const touchObj = {
 	name: "Rings",
 	screenAlpha: 0.2,
-	strokeColor: 'rgb(128, 128, 128)',
+	strokeColor: 'rgb(255, 0, 0)',
+	isntances: 10,
 	randomMovement: 0,
-	radius: 0,
-	growth: 1,
+	radius: 1,
+	growth: 0,
 	alpha: 1,
 	alphaChange: -0
 };
@@ -54,15 +55,18 @@ function draw(){
 function onMouseMove(e){
     const now = performance.now();
     if (now - lastRingTime >= 1000 / 60) { 
-        const ring = { 
-			x: e.clientX, 
-			y: e.clientY, 
-			xv: 0,
-			yv: 0,
-			radius: touchObj.radius, 
-			alpha: touchObj.alpha
-		}; 
-        touches.push(ring);
+		let isntance = touchObj.randomMovement ? touchObj.isntances : 1;
+		for (let i = 0; i < isntance; i++) {
+			const ring = { 
+				x: e.clientX, 
+				y: e.clientY, 
+				xv: 0,
+				yv: 0,
+				radius: touchObj.radius, 
+				alpha: touchObj.alpha
+			}; 
+			touches.push(ring);
+		}
         lastRingTime = now;
     }
 }
