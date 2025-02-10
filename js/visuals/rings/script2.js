@@ -1,3 +1,4 @@
+//fireworks
 let particles = [];
 
 function createParticle(x, y) {

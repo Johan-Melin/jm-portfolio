@@ -3,9 +3,23 @@ let ctx;
 let offscreenCanvas;
 let offscreenCtx;
 
+const touches = [];
+let lastRingTime = 0;
+
 let lastTime = performance.now();
 let frameCount = 0;
-let fps = 0;
+let fps = 60;
+
+const touchObj = {
+	name: "Rings",
+	screenAlpha: 0.2,
+	strokeColor: 'rgb(128, 128, 128)',
+	randomMovement: 0,
+	radius: 0,
+	growth: 1,
+	alpha: 1,
+	alphaChange: -0
+};
 
 window.onload = function(){
 	canvas = document.getElementById('canvas');	
@@ -17,6 +31,7 @@ window.onload = function(){
 	offscreenCtx = offscreenCanvas.getContext('2d');
 	offscreenCanvas.width = canvas.clientWidth;
     offscreenCanvas.height = canvas.clientHeight;
+	offscreenCtx.fillStyle = `rgba(255, 255, 255, ${touchObj.screenAlpha})`;
 
 	window.requestAnimationFrame(draw);
 	canvas.onmousemove = function (e) {
@@ -28,12 +43,55 @@ window.onload = function(){
 }
 
 function draw(){
-	offscreenCtx.clearRect(0, 0, canvas.width, canvas.height);
+	offscreenCtx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.clearRect(0, 0, canvas.width, canvas.height); 
     drawData();
-	drawFPS();
 	ctx.drawImage(offscreenCanvas, 0, 0);
+	drawFPS();
     window.requestAnimationFrame(draw);	
+}
+
+function onMouseMove(e){
+    const now = performance.now();
+    if (now - lastRingTime >= 1000 / 60) { 
+        const ring = { 
+			x: e.clientX, 
+			y: e.clientY, 
+			xv: 0,
+			yv: 0,
+			radius: touchObj.radius, 
+			alpha: touchObj.alpha
+		}; 
+        touches.push(ring);
+        lastRingTime = now;
+    }
+}
+
+function drawData(){
+	let i = touches.length;
+	while (i--){
+		touches[i].xv += Math.random() * touchObj.randomMovement - touchObj.randomMovement / 2;
+		touches[i].yv += Math.random() * touchObj.randomMovement - touchObj.randomMovement / 2;	
+		touches[i].x += touches[i].xv;
+		touches[i].y += touches[i].yv;
+		
+		drawCircle(touches[i]);
+		touches[i].alpha += touchObj.alphaChange;
+		touches[i].radius += touchObj.growth;
+		const maxRadius = 2 * Math.sqrt(canvas.width * canvas.width + canvas.height * canvas.height) / 2;
+
+		if(
+			touches[i].alpha <= 0 || 
+			touches[i].radius <= 0 || 
+			touches[i].x + touches[i].radius < 0 ||
+			touches[i].y + touches[i].radius < 0 ||
+			touches[i].x - touches[i].radius > canvas.width ||
+			touches[i].y - touches[i].radius > canvas.height ||
+			touches[i].radius > maxRadius
+		) {
+			touches.splice(i, 1);
+		}
+	}		
 }
 
 function drawFPS() {
@@ -50,7 +108,7 @@ function drawFPS() {
 	ctx.save();
     ctx.font = '16px Arial';
     ctx.fillStyle = 'red'; 
-    ctx.fillText(`FPS: ${fps}`, 10, 20); 
+    ctx.fillText(`FPS: ${fps} rings: ${touches.length}`, 10, 20); 
     ctx.restore();
 }
 
@@ -68,7 +126,9 @@ document.addEventListener('touchend', function(e) {
 
 function drawCircle(ring){
 	const {x, y, radius, alpha} = ring;
-	offscreenCtx.strokeStyle = `rgba(128, 128, 128, ${alpha})`;
+	const [r, g, b] = touchObj.strokeColor.match(/\d+/g);
+    const color = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+	offscreenCtx.strokeStyle = color;
 	offscreenCtx.beginPath();
 	offscreenCtx.arc(x, y, radius, 0, Math.PI*2, true); 
 	offscreenCtx.stroke();
