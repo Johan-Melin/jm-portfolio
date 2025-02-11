@@ -123,7 +123,7 @@ function getRandomColorWithAlpha() {
     const r = Math.floor(Math.random() * 256);
     const g = Math.floor(Math.random() * 256);
     const b = Math.floor(Math.random() * 256);
-    return `rga(${r}, ${g}, ${b}, ${touchObj.alpha})`;
+    return `rgba(${r}, ${g}, ${b}, ${touchObj.alpha})`;
 }
 
 function drawData() {
@@ -178,16 +178,9 @@ function drawFPS() {
     ctx.fillText(`FPS: ${fps} | Rings: ${touches.length}`, 10, 20);
     ctx.restore();
 }
-/*
-document.addEventListener('touchstart', function(e) {
-	e.preventDefault();
-}, { passive: false });
 
 document.addEventListener('touchmove', function(e) {
-	e.preventDefault();
+    if (!e.target.classList.contains('slider')) {
+        e.preventDefault();
+    }
 }, { passive: false });
-
-document.addEventListener('touchend', function(e) {
-	e.preventDefault();
-}, { passive: false });
-*/
