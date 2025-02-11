@@ -7,14 +7,13 @@ let fps = 60;
 
 const touchObj = {
     name: "Rings",
-    screenAlpha: 0.2,
+    screenAlpha: 0.1,
     strokeColor: 'rgb(255, 0, 0)',
-    isntances: 10,
+    instances: 10,
     randomMovement: 0,
-    radius: 1,
+    radius: 0.5,
     growth: 0,
     alpha: 1,
-    alphaChange: -0
 };
 
 window.onload = function() {
@@ -42,11 +41,6 @@ window.onload = function() {
         touchObj.strokeColor = hexToRgb(e.target.value);
     });
 	
-	document.getElementById('radius').addEventListener('input', function(e) {
-		touchObj.radius = parseFloat(e.target.value);
-		document.getElementById('radius-value').textContent = e.target.value;
-	});
-	
 	document.getElementById('growth').addEventListener('input', function(e) {
 		touchObj.growth = parseFloat(e.target.value);
 		document.getElementById('growth-value').textContent = e.target.value;
@@ -56,60 +50,80 @@ window.onload = function() {
 		touchObj.alpha = parseFloat(e.target.value);
 		document.getElementById('alpha-value').textContent = e.target.value;
 	});
-	
-	document.getElementById('alphaChange').addEventListener('input', function(e) {
-		touchObj.alphaChange = parseFloat(e.target.value);
-		document.getElementById('alphaChange-value').textContent = e.target.value;
-	});
+
 	
 	document.getElementById('randomMovement').addEventListener('input', function(e) {
 		touchObj.randomMovement = parseFloat(e.target.value);
 		document.getElementById('randomMovement-value').textContent = e.target.value;
 	});
 	
-	document.getElementById('isntances').addEventListener('input', function(e) {
-		touchObj.isntances = parseFloat(e.target.value);
-		document.getElementById('isntances-value').textContent = e.target.value;
+	document.getElementById('instances').addEventListener('input', function(e) {
+		touchObj.instances = parseFloat(e.target.value);
+		document.getElementById('instances-value').textContent = e.target.value;
 	});
 	
 	document.getElementById('screenAlpha').addEventListener('input', function(e) {
 		touchObj.screenAlpha = parseFloat(e.target.value);
 		document.getElementById('screenAlpha-value').textContent = e.target.value;
 	});
+
+	document.getElementById('resetButton').addEventListener('click', function() {
+		resetValues();
+	});
 }
 
-function draw() {
-    offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
-    const bgColor = '255, 255, 255';
-    const alpha = touchObj.screenAlpha;
-    const color = `rgba(${bgColor}, ${alpha})`;
-    offscreenCtx.fillStyle = color;
-    offscreenCtx.fillRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+function resetValues() {
+	touchObj.growth = Math.floor(Math.random() * 11);
+	touchObj.alpha = parseFloat(Math.random() * 1).toFixed(1);
+	touchObj.randomMovement = Math.floor(Math.random() * 6);
+    touchObj.instances = Math.floor(Math.random() * 10 + 1);
+    touchObj.screenAlpha = parseFloat((Math.random() * 0.1).toFixed(1));
+    updateSlider('growth', touchObj.growth);
+    updateSlider('alpha', touchObj.alpha);
+    updateSlider('randomMovement', touchObj.randomMovement);
+    updateSlider('instances', touchObj.instances);
+    updateSlider('screenAlpha', touchObj.screenAlpha);
+}
 
+function updateSlider(id, value) {
+    document.getElementById(id).value = value;
+    document.getElementById(`${id}-value`).textContent = value;
+}
+
+function draw(){
+	offscreenCtx.fillStyle = `rgba(255, 255, 255, ${touchObj.screenAlpha})`;
+	offscreenCtx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height); 
     drawData();
-    drawFPS();
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(offscreenCanvas, 0, 0);
-    window.requestAnimationFrame(draw);
+	ctx.drawImage(offscreenCanvas, 0, 0);
+	drawFPS();
+    window.requestAnimationFrame(draw);	
 }
 
 function onMouseMove(e) {
     const now = performance.now();
     if (now - lastRingTime >= 1000 / 60) {
-        let isntance = touchObj.randomMovement ? touchObj.isntances : 1;
-        for (let i = 0; isntance > i; i++) {
+        let instance = touchObj.randomMovement ? touchObj.instances : 1;
+        for (let i = 0; instance > i; i++) {
             const ring = {
                 x: e.clientX,
                 y: e.clientY,
                 xv: 0,
                 yv: 0,
                 radius: touchObj.radius,
-                alpha: touchObj.alpha
+				color: getRandomColorWithAlpha(),
             };
             touches.push(ring);
         }
         lastRingTime = now;
     }
+}
+
+function getRandomColorWithAlpha() {
+    const r = Math.floor(Math.random() * 256);
+    const g = Math.floor(Math.random() * 256);
+    const b = Math.floor(Math.random() * 256);
+    return `rga(${r}, ${g}, ${b}, ${touchObj.alpha})`;
 }
 
 function drawData() {
@@ -121,7 +135,6 @@ function drawData() {
         touches[i].y += touches[i].yv;
 
         drawCircle(touches[i]);
-        touches[i].alpha += touchObj.alphaChange;
         touches[i].radius += touchObj.growth;
 
         const maxRadius = Math.sqrt(canvas.width * canvas.width + canvas.height * canvas.height) / 2;
@@ -141,9 +154,7 @@ function hexToRgb(hex) {
 }
 
 function drawCircle(ring) {
-    const { x, y, radius, alpha } = ring;
-    const [r, g, b] = touchObj.strokeColor.match(/\d+/g);
-    const color = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    const { x, y, radius, color } = ring;
     offscreenCtx.strokeStyle = color;
     offscreenCtx.beginPath();
     offscreenCtx.arc(x, y, radius, 0, Math.PI * 2, true);
@@ -164,7 +175,7 @@ function drawFPS() {
     ctx.save();
     ctx.font = '16px Arial';
     ctx.fillStyle = 'red';
-    ctx.fillText(`FPS: ${fps}`, 10, 20);
+    ctx.fillText(`FPS: ${fps} | Rings: ${touches.length}`, 10, 20);
     ctx.restore();
 }
 /*

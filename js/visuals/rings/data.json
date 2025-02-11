@@ -3,22 +3,18 @@
 		"name": "Veins",
 		"screenAlpha": 0,
 		"strokeColor": "rgb(255, 0, 0)",
-        "isntances": 1,
+        "instances": 1,
 		"randomMovement": 0.1,
-		"radius": 0.5,
 		"growth": 0,
-		"alpha": 0.03,
-		"alphaChange": 0
+		"alpha": 0.03
 	},
 	{
 		"name": "Rings",
 		"screenAlpha": 0.2,
 		"strokeColor": "rgb(128, 128, 128)",
-        "isntances": 1,
+        "instances": 1,
 		"randomMovement": 0,
-		"radius": 1,
 		"growth": 1,
-		"alpha": 1,
-		"alphaChange": -0.005
+		"alpha": 1
 	}
 ]
